@@ -4,6 +4,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+hexlet.mv.db
+hexlet.trace.db
 
 ### STS ###
 .apt_generated
