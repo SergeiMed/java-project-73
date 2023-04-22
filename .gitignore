@@ -8,3 +8,4 @@ out/
 hexlet.mv.db
 hexlet.trace.db
 .idea/workspace.xml
+config
