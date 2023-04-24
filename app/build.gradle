@@ -118,6 +118,10 @@ jacocoTestReport {
 	}
 }
 
+jacocoTestReport {
+	dependsOn test
+}
+
 checkstyle {
 	toolVersion '9.0'
 }
