@@ -2,12 +2,14 @@ package hexlet.code.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Column;
 import javax.persistence.Temporal;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,6 +48,11 @@ public class User {
     @CreationTimestamp
     @Temporal(TIMESTAMP)
     private Date createdAt;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    private boolean active;
 
     public User(final Long id) {
         this.id = id;
