@@ -17,13 +17,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import static hexlet.code.controller.UserController.USER_CONTROLLER_PATH;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpMethod.DELETE;
 
 @Configuration
 @EnableWebSecurity
@@ -32,12 +32,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String LOGIN = "/login";
 
-    public static final List<GrantedAuthority> DEFAULT_AUTHORITIES = List.of(new SimpleGrantedAuthority("USER"),
-            new SimpleGrantedAuthority("ADMIN"));
+    public static final List<GrantedAuthority> DEFAULT_AUTHORITIES = List.of(new SimpleGrantedAuthority("USER"));
 
     private final RequestMatcher publicUrls;
     private final RequestMatcher loginRequest;
-    //private final RequestMatcher adminUrls;
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JWTHelper jwtHelper;
@@ -48,24 +46,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.loginRequest = new AntPathRequestMatcher(baseUrl + LOGIN, POST.toString());
         this.publicUrls = new OrRequestMatcher(
                 loginRequest,
-//                new AntPathRequestMatcher(baseUrl + USER_CONTROLLER_PATH, POST.toString()),
-//                new AntPathRequestMatcher(baseUrl + USER_CONTROLLER_PATH, GET.toString())
-
-                //new NegatedRequestMatcher(new AntPathRequestMatcher(baseUrl + "/**"))
-
-
-                new AntPathRequestMatcher("/**", GET.toString()),
-                new AntPathRequestMatcher("/**", POST.toString()),
-                new AntPathRequestMatcher("/**", PUT.toString()),
-                new AntPathRequestMatcher("/**", DELETE.toString())
+                new AntPathRequestMatcher(baseUrl + USER_CONTROLLER_PATH, POST.toString()),
+                new AntPathRequestMatcher(baseUrl + USER_CONTROLLER_PATH, GET.toString()),
+                new NegatedRequestMatcher(new AntPathRequestMatcher(baseUrl + "/**"))
         );
-//        this.adminUrls = new OrRequestMatcher(
-//                loginRequest,
-//                new AntPathRequestMatcher("/**", GET.toString()),
-//                new AntPathRequestMatcher("/**", POST.toString()),
-//                new AntPathRequestMatcher("/**", PUT.toString()),
-//                new AntPathRequestMatcher("/**", DELETE.toString())
-//        );
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.jwtHelper = jwtHelper;
@@ -97,14 +81,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(authenticationFilter)
+                //.addFilter(authenticationFilter)
                 .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().disable()
                 .formLogin().disable()
                 .httpBasic().disable()
                 .logout().disable();
-
-        http.headers().frameOptions().disable();
     }
-
 }
