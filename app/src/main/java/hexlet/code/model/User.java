@@ -52,10 +52,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private boolean active;
-
     public User(final Long id) {
         this.id = id;
     }
-
 }
