@@ -1,0 +1,31 @@
+server:
+  error:
+    include-stacktrace: on_param
+
+spring:
+  datasource:
+    url: 'jdbc:h2:./task_manager_db'
+    username: ''
+    password: ''
+    driverClassName: org.h2.Driver
+  jpa:
+    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+#
+    liquibase:
+      enabled: true
+
+  # Настраиваем консоль Н2
+  # Это позволит нам открыть её в браузере по указанному пути
+  h2:
+    console:
+      enabled: true
+      # Указываем путь, по которому будет открываться консоль
+      path: /h2console/
+      settings:
+        web-allow-others: true
+
+logging:
+  level:
+    root: INFO
+    web: DEBUG

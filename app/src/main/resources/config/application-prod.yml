@@ -2,6 +2,10 @@ server:
   error:
     include-stacktrace: never
 
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+
 spring:
   devtools:
     restart:
@@ -10,9 +14,12 @@ spring:
       enabled: false
 
   datasource:
+    url: ${JDBC_DATABASE_URL}
     username: ${JDBC_DATABASE_USERNAME}
     password: ${JDBC_DATABASE_PASSWORD}
-    url: ${JDBC_DATABASE_URL}
+
+    liquibase:
+      enabled: false
 
   jpa:
     show-sql: false
