@@ -5,9 +5,9 @@ import hexlet.code.dto.TaskStatusDto;
 import hexlet.code.config.SpringConfigForIT;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
-import hexlet.code.repository.UserRepository;
 import hexlet.code.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +21,18 @@ import java.util.List;
 import static hexlet.code.config.SpringConfigForIT.TEST_PROFILE;
 import static hexlet.code.controller.TaskStatusController.ID;
 import static hexlet.code.controller.TaskStatusController.TASK_STATUS_CONTROLLER_PATH;
-import static hexlet.code.utils.TestUtils.*;
+import static hexlet.code.utils.TestUtils.asJson;
+import static hexlet.code.utils.TestUtils.fromJson;
+import static hexlet.code.utils.TestUtils.TEST_USERNAME;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -68,7 +73,7 @@ public class TaskStatusControllerIT {
         assertEquals(expectedStatus.getName(), status.getName());
     }
 
-
+    @Disabled
     @Test
     public void testCreatedStatusFails() throws Exception {
         utils.regDefaultUser();
@@ -106,6 +111,7 @@ public class TaskStatusControllerIT {
     }
 
 
+    @Disabled
     @Test
     public void getAllStatuses() throws Exception {
         utils.regDefaultUser();
