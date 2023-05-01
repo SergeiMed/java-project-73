@@ -34,4 +34,3 @@ public class AppApplication {
         return config.getAuthenticationManager();
     }
 }
-
