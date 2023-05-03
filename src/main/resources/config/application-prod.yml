@@ -1,0 +1,29 @@
+server:
+  error:
+    include-stacktrace: never
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+  datasource:
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
+
+    liquibase:
+      enabled: false
+
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    ROOT: INFO
