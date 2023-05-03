@@ -73,7 +73,7 @@ public class TaskStatusControllerIT {
         assertEquals(expectedStatus.getName(), status.getName());
     }
 
-    @Disabled
+
     @Test
     public void testCreatedStatusFails() throws Exception {
         utils.regDefaultUser();
@@ -111,7 +111,6 @@ public class TaskStatusControllerIT {
     }
 
 
-    @Disabled
     @Test
     public void getAllStatuses() throws Exception {
         utils.regDefaultUser();
