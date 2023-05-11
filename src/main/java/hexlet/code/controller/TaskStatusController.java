@@ -74,8 +74,6 @@ public class TaskStatusController {
             schema = @Schema(implementation = TaskStatus.class))))
     @GetMapping
     public List<TaskStatus> getAll() {
-        return taskStatusRepository.findAll()
-                .stream()
-                .toList();
+        return taskStatusRepository.findAll();
     }
 }

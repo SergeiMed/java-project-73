@@ -9,6 +9,8 @@ import hexlet.code.service.TaskService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static hexlet.code.controller.TaskController.TASK_CONTROLLER_PATH;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -51,6 +55,14 @@ public class TaskController {
             @Parameter(description = "Predicate based on query params")
             @QuerydslPredicate(root = Task.class) Predicate predicate) {
         return taskRepository.findAll(predicate);
+    }
+
+
+    @Operation(summary = "Get all tasks")
+    @ApiResponses(@ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Task.class))))
+    @GetMapping
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
     }
 
 

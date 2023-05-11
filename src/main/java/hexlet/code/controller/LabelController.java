@@ -2,7 +2,6 @@ package hexlet.code.controller;
 
 import hexlet.code.dto.LabelDto;
 import hexlet.code.model.Label;
-import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.service.LabelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,12 +46,10 @@ public class LabelController {
 
 
     @Operation(summary = "Get all labels")
-    @ApiResponses(@ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = User.class))))
+    @ApiResponses(@ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Label.class))))
     @GetMapping
     public List<Label> getLabels() {
-        return labelRepository.findAll()
-                .stream()
-                .toList();
+        return labelRepository.findAll();
     }
 
 

@@ -52,9 +52,7 @@ public class UserController {
     @ApiResponses(@ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = User.class))))
     @GetMapping
     public List<User> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
-                .toList();
+        return userRepository.findAll();
     }
 
 
