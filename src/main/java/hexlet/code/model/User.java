@@ -50,6 +50,7 @@ public class User {
     private Date createdAt;
 
     @Enumerated(EnumType.STRING)
+    @JsonIgnore
     private Role role;
 
     public User(final Long id) {

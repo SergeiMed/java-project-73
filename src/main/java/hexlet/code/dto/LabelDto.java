@@ -13,6 +13,5 @@ import javax.validation.constraints.Size;
 public class LabelDto {
 
     @NotBlank
-    @Size(min = 1)
     private String name;
 }
