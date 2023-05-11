@@ -31,7 +31,7 @@ public class Label {
     private Long id;
 
     @NotBlank
-    @Column(columnDefinition = "varchar(1001)", unique = true)
+    @Column(unique = true)
     private String name;
 
     @CreationTimestamp
