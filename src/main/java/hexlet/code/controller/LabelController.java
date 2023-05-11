@@ -46,7 +46,8 @@ public class LabelController {
 
 
     @Operation(summary = "Get all labels")
-    @ApiResponses(@ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = Label.class))))
+    @ApiResponses(@ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = Label.class))))
     @GetMapping
     public List<Label> getLabels() {
         return labelRepository.findAll();
