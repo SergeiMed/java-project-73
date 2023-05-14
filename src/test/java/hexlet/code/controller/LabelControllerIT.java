@@ -7,6 +7,7 @@ import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,12 @@ public class LabelControllerIT {
     private LabelRepository labelRepository;
     @Autowired
     private TestUtils utils;
+
+    @BeforeEach
+    public void testInit() throws Exception {
+        utils.createDefaultLabel();
+    }
+
     @AfterEach
     public void clear() {
         utils.tearDown();
@@ -53,63 +60,40 @@ public class LabelControllerIT {
 
     @Test
     public void testCreateLabel() throws Exception {
-        utils.regDefaultUser();
-        final var labelDto = new LabelDto("new");
-        final var postRequest = post(BASE_URL + LABEL_CONTROLLER_PATH)
-                .content(asJson(labelDto))
-                .contentType(APPLICATION_JSON);
-        final var response = utils.perform(postRequest, TEST_USERNAME)
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse();
-        final Label expectedLabel = labelRepository.findAll().get(0);
-        final Label label = fromJson(response.getContentAsString(), new TypeReference<>() {
-        });
-        assertTrue(labelRepository.existsById(label.getId()));
-        assertEquals(expectedLabel.getId(), label.getId());
-        assertEquals(expectedLabel.getName(), label.getName());
+        assertEquals(1, labelRepository.count());
+        utils.createLabel(new LabelDto("Test label 1")).andExpect(status().isCreated());
+        assertEquals(2, labelRepository.count());
     }
 
 
     @Test
     public void testCreatedLabelFails() throws Exception {
-        utils.regDefaultUser();
         final var labelDto = new LabelDto("");
         final var postRequest = post(BASE_URL + LABEL_CONTROLLER_PATH)
                 .content(asJson(labelDto))
                 .contentType(APPLICATION_JSON);
-        assertEquals(0, labelRepository.count());
+        utils.perform(postRequest, TEST_USERNAME).andExpect(status().isBadRequest());
+        assertEquals(1, labelRepository.count());
     }
 
 
     @Test
     public void testUpdateLabel() throws Exception {
-        utils.regDefaultUser();
-        final var postRequest = post(BASE_URL + LABEL_CONTROLLER_PATH)
-                .content(asJson(new LabelDto("new")))
+        final Long existLabelId = labelRepository.findAll().get(0).getId();
+        final LabelDto updateLabelDto = new LabelDto("New label");
+        final var updateRequest = put(
+                BASE_URL + LABEL_CONTROLLER_PATH + ID, existLabelId)
+                .content(asJson(updateLabelDto))
                 .contentType(APPLICATION_JSON);
-        utils.perform(postRequest, TEST_USERNAME);
-        Label createdLabel = labelRepository.findAll().get(0);
-        final var labelDto = new LabelDto("feature");
-        final var putRequest = put(BASE_URL + LABEL_CONTROLLER_PATH + ID, createdLabel.getId())
-                .content(asJson(labelDto))
-                .contentType(APPLICATION_JSON);
-        final var response = utils.perform(putRequest, TEST_USERNAME)
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
-        createdLabel = labelRepository.findAll().get(0);
-        final Label label = fromJson(response.getContentAsString(), new TypeReference<>() {
-        });
-        assertEquals(createdLabel.getId(), label.getId());
-        assertEquals(createdLabel.getName(), labelDto.getName());
+        utils.perform(updateRequest, TEST_USERNAME).andExpect(status().isOk());
+        assertTrue(labelRepository.existsById(existLabelId));
+        assertEquals(labelRepository.findAll().get(0).getName(), updateLabelDto.getName());
     }
 
 
     @Test
     public void getAllLabels() throws Exception {
-        utils.regDefaultUser();
-        final var labelDto = new LabelDto("new");
+        final var labelDto = new LabelDto("Test label 1");
         final var postRequest = post(BASE_URL + LABEL_CONTROLLER_PATH)
                 .content(asJson(labelDto))
                 .contentType(APPLICATION_JSON);
@@ -121,23 +105,14 @@ public class LabelControllerIT {
                 .getResponse();
         final List<Label> labels = fromJson(response.getContentAsString(), new TypeReference<>() {
         });
-        assertThat(labels.size()).isEqualTo(1);
+        assertThat(labels.size()).isEqualTo(2);
     }
 
 
     @Test
     public void deleteLabel() throws Exception {
-        utils.regDefaultUser();
-        final var labelDto = new LabelDto("bug");
-        final var postRequest = post(BASE_URL + LABEL_CONTROLLER_PATH)
-                .content(asJson(labelDto))
-                .contentType(APPLICATION_JSON);
-        utils.perform(postRequest, TEST_USERNAME)
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse();
-        utils.perform(delete(BASE_URL + LABEL_CONTROLLER_PATH + ID,
-                                labelRepository.findAll().get(0).getId()),
+        assertEquals(1, labelRepository.count());
+        utils.perform(delete(BASE_URL + LABEL_CONTROLLER_PATH + ID, labelRepository.findAll().get(0).getId()),
                         TEST_USERNAME)
                 .andExpect(status().isOk());
         assertEquals(0, labelRepository.count());

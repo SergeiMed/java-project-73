@@ -3,9 +3,10 @@ package hexlet.code.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.LabelDto;
+import hexlet.code.dto.TaskStatusDto;
 import hexlet.code.dto.UserDto;
 import hexlet.code.component.JWTHelper;
-import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
@@ -19,6 +20,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import java.util.Map;
 
 import static hexlet.code.controller.UserController.USER_CONTROLLER_PATH;
+import static hexlet.code.controller.TaskStatusController.TASK_STATUS_CONTROLLER_PATH;
+import static hexlet.code.controller.LabelController.LABEL_CONTROLLER_PATH;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -35,6 +38,8 @@ public class TestUtils {
             "lastName",
             "password"
     );
+    private final TaskStatusDto testStatusDto = new TaskStatusDto("Test status");
+    private final LabelDto testLabelDto = new LabelDto("Test label");
 
     public UserDto getTestRegistrationDto() {
         return testRegistrationDto;
@@ -61,9 +66,10 @@ public class TestUtils {
         userRepository.deleteAll();
     }
 
-    public User getUserByEmail(final String email) {
-        return userRepository.findByEmail(email).get();
-    }
+//    public User getUserByEmail(final String email) {
+//        return userRepository.findByEmail(email).get();
+//    }
+
 
     public ResultActions regDefaultUser() throws Exception {
         return regUser(testRegistrationDto);
@@ -75,6 +81,30 @@ public class TestUtils {
                 .contentType(APPLICATION_JSON);
         return perform(request);
     }
+
+    public ResultActions createDefaultStatus() throws Exception {
+        return createStatus(testStatusDto);
+    }
+
+    public ResultActions createStatus(final TaskStatusDto statusDto) throws Exception {
+        final var request = post("/api" + TASK_STATUS_CONTROLLER_PATH)
+                .content(asJson(statusDto))
+                .contentType(APPLICATION_JSON);
+        return perform(request, TEST_USERNAME);
+    }
+
+    public ResultActions createDefaultLabel() throws Exception {
+        return createLabel(testLabelDto);
+    }
+
+    public ResultActions createLabel(LabelDto testLabelDto) throws Exception {
+        final var request = post("/api" + LABEL_CONTROLLER_PATH)
+                .content(asJson(testLabelDto))
+                .contentType(APPLICATION_JSON);
+        return perform(request, TEST_USERNAME);
+    }
+
+
 
     public ResultActions perform(final MockHttpServletRequestBuilder request, final String byUser) throws Exception {
         final String token = jwtHelper.expiring(Map.of("username", byUser));

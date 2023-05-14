@@ -3,10 +3,11 @@ package hexlet.code.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import hexlet.code.dto.TaskStatusDto;
 import hexlet.code.config.SpringConfigForIT;
-import hexlet.code.model.TaskStatus;
+import hexlet.code.model.Label;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.List;
 
 import static hexlet.code.config.SpringConfigForIT.TEST_PROFILE;
-import static hexlet.code.controller.TaskStatusController.ID;
 import static hexlet.code.controller.TaskStatusController.TASK_STATUS_CONTROLLER_PATH;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
@@ -46,6 +46,10 @@ public class TaskStatusControllerIT {
     @Autowired
     private TestUtils utils;
 
+    @BeforeEach
+    public void testInit() throws Exception {
+        utils.createDefaultStatus();
+    }
 
     @AfterEach
     public void clear() {
@@ -55,67 +59,44 @@ public class TaskStatusControllerIT {
 
     @Test
     public void testCreateStatus() throws Exception {
-        utils.regDefaultUser();
-        final var statusDto = new TaskStatusDto("new");
-        final var postRequest = post(BASE_URL + TASK_STATUS_CONTROLLER_PATH)
-                .content(asJson(statusDto))
-                .contentType(APPLICATION_JSON);
-        final var response = utils.perform(postRequest, TEST_USERNAME)
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse();
-        final TaskStatus expectedStatus = statusRepository.findAll().get(0);
-        final TaskStatus status = fromJson(response.getContentAsString(), new TypeReference<>() {
-        });
-        assertTrue(statusRepository.existsById(status.getId()));
-        assertEquals(expectedStatus.getId(), status.getId());
-        assertEquals(expectedStatus.getName(), status.getName());
+        assertEquals(1, statusRepository.count());
+        utils.createStatus(new TaskStatusDto("Task status 1")).andExpect(status().isCreated());
+        assertEquals(2, statusRepository.count());
     }
 
 
     @Test
     public void testCreatedStatusFails() throws Exception {
-        utils.regDefaultUser();
+        assertEquals(1, statusRepository.count());
         final var statusDto = new TaskStatusDto("");
         final var postRequest = post(BASE_URL + TASK_STATUS_CONTROLLER_PATH)
                 .content(asJson(statusDto))
                 .contentType(APPLICATION_JSON);
         utils.perform(postRequest, TEST_USERNAME)
-                .andExpect(status().is(400));
-        assertEquals(0, statusRepository.count());
+                .andExpect(status().isBadRequest());
+        assertEquals(1, statusRepository.count());
     }
 
 
     @Test
     public void testUpdateStatus() throws Exception {
-        utils.regDefaultUser();
-        final var postRequest = post(BASE_URL + TASK_STATUS_CONTROLLER_PATH)
-                .content(asJson(new TaskStatusDto("new")))
+        final Long existStatusId = statusRepository.findAll().get(0).getId();
+        final var updateTaskStatusDto = new TaskStatusDto("Updated status");
+        final var updateRequest = put(
+                BASE_URL + TASK_STATUS_CONTROLLER_PATH + TaskStatusController.ID, existStatusId)
+                .content(asJson(updateTaskStatusDto))
                 .contentType(APPLICATION_JSON);
-        utils.perform(postRequest, TEST_USERNAME);
-        TaskStatus createdStatus = statusRepository.findAll().get(0);
-        final var statusDto = new TaskStatusDto("verified");
-        final var putRequest = put(BASE_URL + TASK_STATUS_CONTROLLER_PATH + ID, createdStatus.getId())
-                .content(asJson(statusDto))
-                .contentType(APPLICATION_JSON);
-        final var response = utils.perform(putRequest, TEST_USERNAME)
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
-        createdStatus = statusRepository.findAll().get(0);
-        final TaskStatus status = fromJson(response.getContentAsString(), new TypeReference<>() {
-        });
-        assertEquals(createdStatus.getId(), status.getId());
-        assertEquals(createdStatus.getName(), statusDto.getName());
+        utils.perform(updateRequest, TEST_USERNAME).andExpect(status().isOk());
+        assertTrue(statusRepository.existsById(existStatusId));
+        assertEquals(statusRepository.findAll().get(0).getName(), updateTaskStatusDto.getName());
     }
 
 
     @Test
     public void getAllStatuses() throws Exception {
-        utils.regDefaultUser();
-        final var statusDto = new TaskStatusDto("verified");
+        final var taskStatusDto = new TaskStatusDto("Task status 1");
         final var postRequest = post(BASE_URL + TASK_STATUS_CONTROLLER_PATH)
-                .content(asJson(statusDto))
+                .content(asJson(taskStatusDto))
                 .contentType(APPLICATION_JSON);
         utils.perform(postRequest, TEST_USERNAME)
                 .andExpect(status().isCreated());
@@ -123,26 +104,17 @@ public class TaskStatusControllerIT {
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
-        final List<TaskStatus> statuses = fromJson(response.getContentAsString(), new TypeReference<>() {
+        final List<Label> statuses = fromJson(response.getContentAsString(), new TypeReference<>() {
         });
-        assertThat(statuses.size()).isEqualTo(1);
+        assertThat(statuses.size()).isEqualTo(2);
     }
 
 
     @Test
     public void deleteStatus() throws Exception {
-        utils.regDefaultUser();
-        final var statusDto = new TaskStatusDto("verified");
-        final var postRequest = post(BASE_URL + TASK_STATUS_CONTROLLER_PATH)
-                .content(asJson(statusDto))
-                .contentType(APPLICATION_JSON);
-        utils.perform(postRequest, TEST_USERNAME)
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse();
-        utils.perform(delete(BASE_URL + TASK_STATUS_CONTROLLER_PATH + ID,
-                                statusRepository.findAll().get(0).getId()),
-                        TEST_USERNAME)
+        assertEquals(1, statusRepository.count());
+        utils.perform(delete(BASE_URL + TASK_STATUS_CONTROLLER_PATH + TaskStatusController.ID,
+                                statusRepository.findAll().get(0).getId()), TEST_USERNAME)
                 .andExpect(status().isOk());
         assertEquals(0, statusRepository.count());
     }

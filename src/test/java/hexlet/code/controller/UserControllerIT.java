@@ -8,6 +8,7 @@ import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,12 @@ public class UserControllerIT {
     private UserRepository userRepository;
     @Autowired
     private TestUtils utils;
+
+    @BeforeEach
+    public void testInit() throws Exception {
+        utils.regDefaultUser();
+    }
+
     @AfterEach
     public void clear() {
         utils.tearDown();
@@ -57,9 +64,14 @@ public class UserControllerIT {
 
     @Test
     public void testRegistration() throws Exception {
-        assertEquals(0, userRepository.count());
-        utils.regDefaultUser().andExpect(status().isCreated());
         assertEquals(1, userRepository.count());
+        utils.regUser(new UserDto(
+                TEST_USERNAME_2,
+                "firstname2",
+                "lastname2",
+                "password2"
+        )).andExpect(status().isCreated());
+        assertEquals(2, userRepository.count());
     }
 
     @Test
@@ -73,7 +85,6 @@ public class UserControllerIT {
 
     @Test
     public void testGetUserById() throws Exception {
-        utils.regDefaultUser();
         final User expectedUser = userRepository.findAll().get(0);
         final var response = utils.perform(
                         get(BASE_URL + USER_CONTROLLER_PATH + ID, expectedUser.getId()),
@@ -89,7 +100,6 @@ public class UserControllerIT {
 
     @Test
     public void testGetAllUsers() throws Exception {
-        utils.regDefaultUser();
         final var response = utils.perform(get(BASE_URL + USER_CONTROLLER_PATH))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -101,7 +111,6 @@ public class UserControllerIT {
 
     @Test
     public void testLogin() throws Exception {
-        utils.regDefaultUser();
         final LoginDto loginDto = new LoginDto(
                 utils.getTestRegistrationDto().getEmail(),
                 utils.getTestRegistrationDto().getPassword()
@@ -125,7 +134,6 @@ public class UserControllerIT {
 
     @Test
     public void testUpdateUser() throws Exception {
-        utils.regDefaultUser();
         final Long userId = userRepository.findByEmail(TEST_USERNAME).get().getId();
         final var userDto = new UserDto(TEST_USERNAME_2, "newFirstName", "newLastName", "newPassword");
         final var updateRequest = MockMvcRequestBuilders
@@ -140,7 +148,6 @@ public class UserControllerIT {
 
     @Test
     public void testDeleteUser() throws Exception {
-        utils.regDefaultUser();
         final Long userId = userRepository.findByEmail(TEST_USERNAME).get().getId();
         utils.perform(delete(BASE_URL + USER_CONTROLLER_PATH + ID, userId), TEST_USERNAME)
                 .andExpect(status().isOk());
@@ -149,7 +156,6 @@ public class UserControllerIT {
 
     @Test
     public void deleteUserFails() throws Exception {
-        utils.regDefaultUser();
         utils.regUser(new UserDto(
                 TEST_USERNAME_2,
                 "firstName",
