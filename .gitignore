@@ -3,3 +3,5 @@
 /build/
 /node/
 HELP.md
+task_manager_db.mv.db
+task_manager_db.trace.db
