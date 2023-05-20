@@ -73,7 +73,7 @@ public class TaskStatusControllerIT {
                 .content(asJson(statusDto))
                 .contentType(APPLICATION_JSON);
         utils.perform(postRequest, TEST_USERNAME)
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
         assertEquals(1, statusRepository.count());
     }
 

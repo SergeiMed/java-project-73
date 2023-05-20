@@ -72,7 +72,7 @@ public class LabelControllerIT {
         final var postRequest = post(BASE_URL + LABEL_CONTROLLER_PATH)
                 .content(asJson(labelDto))
                 .contentType(APPLICATION_JSON);
-        utils.perform(postRequest, TEST_USERNAME).andExpect(status().isBadRequest());
+        utils.perform(postRequest, TEST_USERNAME).andExpect(status().isUnprocessableEntity());
         assertEquals(1, labelRepository.count());
     }
 

@@ -80,7 +80,7 @@ public class UserControllerIT {
         final var postRequest = MockMvcRequestBuilders.post(BASE_URL + USER_CONTROLLER_PATH)
                 .content(asJson(userDto))
                 .contentType(APPLICATION_JSON);
-        utils.perform(postRequest, TEST_USERNAME).andExpect(status().is(400));
+        utils.perform(postRequest, TEST_USERNAME).andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -140,7 +140,7 @@ public class UserControllerIT {
                 .put(BASE_URL + USER_CONTROLLER_PATH + ID, userId)
                 .content(asJson(userDto))
                 .contentType(APPLICATION_JSON);
-        utils.perform(updateRequest, TEST_USERNAME_2).andExpect(status().isOk());
+        utils.perform(updateRequest, TEST_USERNAME).andExpect(status().isOk());
         assertTrue(userRepository.existsById(userId));
         assertNull(userRepository.findByEmail(TEST_USERNAME).orElse(null));
         assertNotNull(userRepository.findByEmail(TEST_USERNAME_2).orElse(null));
