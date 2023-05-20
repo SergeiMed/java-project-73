@@ -66,6 +66,7 @@ public class UserController {
 
 
     @Operation(summary = "Update user")
+    @PreAuthorize(ONLY_OWNER_BY_ID)
     @PutMapping(ID)
     public User updateUser(@RequestBody @Valid final UserDto dto, @PathVariable long id) {
         return userService.updateUser(id, dto);
